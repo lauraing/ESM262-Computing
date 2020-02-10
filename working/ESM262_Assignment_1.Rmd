@@ -1,0 +1,32 @@
+---
+title: "Assignment 1"
+author: "Laura Ingulsrud"
+date: "2/10/2020"
+output:
+  html_document:
+    df_print: paged
+    theme: cosmo
+---
+
+<style>
+h1.title{
+    text-align: center
+  }
+h4.author{
+    text-align: center
+  }
+h4.date{
+    text-align: center
+  }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+&nbsp;
+&nbsp;
+
+I am taking this course because I am interested in deepening my understanding of using R and GitHub to create clear and reproducible code. I am doing a focus in Environmental Data Science, and will be working as an Ocean Health Index Fellow at NCEAS this spring and summer. I am hoping this class helps build my confidence in the data science skills I have already learned while at Bren, and expands my knowledge with new skills.
+
+My background in data science started at Bren in Allisons ESM 206 class. I found I enjoyed coding and the concept of open access data science, so I decided to do the focus in Environmental Data Science. Other courses at Bren I've taken that involve data science include Advanced Data, GIS, Advanced GIS, Ecology, Econ, Applied Marine Ecology, and Applied Population Ecology. My group project has also involved using R, Github, and SQLite.
