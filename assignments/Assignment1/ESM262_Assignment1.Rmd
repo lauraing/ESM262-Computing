@@ -9,3 +9,5 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+Ω is the stream power, ρ is the density of water (1000 kg/m3), g is acceleration due to gravity (9.8 m/s2), Q is discharge (m3/s), and S is the channel slope.
+
