@@ -1,7 +1,7 @@
 ---
-title: 'ESM 262: Informal Function Assignment'
-author: "Laura Ingulsrud"
-date: "2/18/2020"
+title: 'ESM 262: Assignment 1'
+author: "Laura Ingulsrud and Keene Morrow"
+date: "2/19/2020"
 output: html_document
 ---
 
