@@ -1,11 +1,43 @@
 ---
 title: 'ESM 262: Assignment 1'
 author: "Laura Ingulsrud and Keene Morrow"
-date: "2/19/2020"
-output: html_document
+date: "2/24/2020"
+output:
+  html_document:
+    df_print: paged
+    theme: cosmo
 ---
+
+<style>
+h1.title{
+    text-align: center
+  }
+h4.author{
+    text-align: center
+  }
+h4.date{
+    text-align: center
+  }
+</style>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+##Stream Power Function
+
+**Stream power** is the rate of energy dissipation against the bed and banks of a river or stream per unit downstream length. It is given by the equation:
+
+$\Omega =\rho gQS$
+
+where $\Omega$ is the stream power, $\rho$ is the density of water (1000 $\frac{kg}{m^3}$), $g$ is acceleration due to gravity (9.8 $\frac{m}{s^2}$), $Q$ is discharge ($\frac{m^3}{s}$), and $S$ is the channel slope.
+
+&nbsp;
+&nbsp;
+
+###Contract
+*Input*: Discharge ($Q$) in $\frac{m^3}{s}$ and channel slope ($S$).
+
+*Output*: Stream power ($\Omega$) in W.
+
+*Parameters*: Density of water ($\rho$) and acceleration due to gravity ($g$).
