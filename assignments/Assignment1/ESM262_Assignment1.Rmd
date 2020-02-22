@@ -24,7 +24,7 @@ h4.date{
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-##Stream Power Function
+## Stream Power Function
 
 **Stream power** is the rate of energy dissipation against the bed and banks of a river or stream per unit downstream length. It is given by the equation:
 
@@ -35,9 +35,45 @@ where $\Omega$ is the stream power, $\rho$ is the density of water (1000 $\frac{
 &nbsp;
 &nbsp;
 
-###Contract
+### Contract
 *Input*: Discharge ($Q$) in $\frac{m^3}{s}$ and channel slope ($S$).
 
 *Output*: Stream power ($\Omega$) in W.
 
-*Parameters*: Density of water ($\rho$) and acceleration due to gravity ($g$).
+*Parameters*: Density of water ($\rho$) in $\frac{g}{m^3}$ and acceleration due to gravity ($g$) in $\frac{m}{s^2}$.
+
+### Function
+
+```{r}
+str_pwr <- function(q, s, rho = 1000, g = 9.8){
+  # Error messages
+  ifelse(q <= 0, return("ERROR: discharge (q) must be greater than 0."), q)
+  ifelse(s <= 0, return("ERROR: slope (s) must be greater than 0."), s)
+  ifelse(rho <= 0, return("ERROR: density (rho) must be greater than 0."), rho)
+  ifelse(g <= 0, return("ERROR: gravity (g) must be greater than 0."), q)
+  
+  # Calculation
+  str_pwr = rho * q * s * g
+  
+  # Result
+  return(str_pwr)
+}
+```
+
+### Function Testing
+```{r}
+# Expected values
+str_pwr(1, 1)
+str_pwr(1, 1, g = 1)
+str_pwr(1, 1, g = 1, rho = 1)
+
+# Error Checking
+# str_pwr(1)
+# str_pwr(1, g = 1, rho = 1)
+# str_pwr(1, rho = 1)
+# str_pwr(0, 1)
+# str_pwr(1, 0)
+# str_pwr(1, 1, g = 0, rho = 1)
+# str_pwr(1, 1, g = 1, rho = 0)
+
+```
