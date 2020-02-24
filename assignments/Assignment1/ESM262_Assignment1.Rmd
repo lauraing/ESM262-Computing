@@ -45,15 +45,10 @@ where $\Omega$ is the stream power, $\rho$ is the density of water (1000 $\frac{
 ### Function
 
 ```{r}
-stream_power = function(Q, S, rho=1000, g=9.8) {
-  # if inputs are negative, return message "[input] must be greater than zero" using two different kinds of error checking 
-  Q = ifelse((Q < 0), return("discharge must be greater than zero"), Q)
-  S = ifelse((S < 0), return("channel slope must be greater than zero"), S)
-  if (rho < 0) return("rho must be greater than zero")
-  # calculate stream power
-  result = rho * g * Q * S
-  return(result)
-}
+
+# Bring in stream power function
+source("stream_power.R")
+
 ```
 
 ### Function Testing
@@ -73,3 +68,42 @@ stream_power(1, 1, g = 1, rho = 1)
 # stream_power(1, 1, g = 1, rho = 0)
 
 ```
+
+### Generate Data
+
+```{r data1}
+
+###### One way to generate data for the function ######
+
+# generate discharge values from a distribution
+nsample = 100
+discharges = rnorm(mean=25, sd=4, n=nsample)
+channelslopes = rnorm(mean=50, sd=1, n=nsample)
+
+#create a dataframe that has rows for each model run
+# columns for discharge, channel slope and stream power estimate
+results = data.frame(discharge=discharges, channelslope=channelslopes, streampower=NA)
+
+head(results)
+
+```
+
+```{r data2}
+
+###### Second way to generate data for the function ######
+
+# generate a structure to store info on our possible streams
+possible_streams = data.frame(name = c("A","B","C"), discharge = c(10,20,30), channelslope = c(2,3,1))
+
+# add to the data structure
+possible_streams$power = stream_power(Q = possible_streams$discharge, S = possible_streams$channelslope)
+
+head(possible_streams)
+
+# show results                         
+ggplot(possible_streams, aes(x=discharge, y=power, fill=channelslope))+geom_col()+labs(y="Power W", x="Discharge (m^3/s)")
+
+```
+
+[Graph and add some text describing how to interpret the results. Why should we care?]
+
