@@ -59,17 +59,17 @@ stream_power = function(Q, S, rho=1000, g=9.8) {
 ### Function Testing
 ```{r}
 # Expected values
-str_pwr(1, 1)
-str_pwr(1, 1, g = 1)
-str_pwr(1, 1, g = 1, rho = 1)
+stream_power(1, 1)
+stream_power(1, 1, g = 1)
+stream_power(1, 1, g = 1, rho = 1)
 
 # Error Checking
-# str_pwr(1)
-# str_pwr(1, g = 1, rho = 1)
-# str_pwr(1, rho = 1)
-# str_pwr(0, 1)
-# str_pwr(1, 0)
-# str_pwr(1, 1, g = 0, rho = 1)
-# str_pwr(1, 1, g = 1, rho = 0)
+# stream_power(1)
+# stream_power(1, g = 1, rho = 1)
+# stream_power(1, rho = 1)
+# stream_power(0, 1)
+# stream_power(1, 0)
+# stream_power(1, 1, g = 0, rho = 1)
+# stream_power(1, 1, g = 1, rho = 0)
 
 ```
