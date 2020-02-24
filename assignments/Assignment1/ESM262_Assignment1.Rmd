@@ -22,6 +22,8 @@ h4.date{
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
 ```
 
 ## Stream Power Function
@@ -30,17 +32,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 $\Omega =\rho gQS$
 
-where $\Omega$ is the stream power, $\rho$ is the density of water (1000 $\frac{kg}{m^3}$), $g$ is acceleration due to gravity (9.8 $\frac{m}{s^2}$), $Q$ is discharge ($\frac{m^3}{s}$), and $S$ is the channel slope.
+where 
+
+- $\Omega$ is the stream power
+- $\rho$ is the density of water (1000 $\frac{kg}{m^3}$)
+- $g$ is acceleration due to gravity (9.8 $\frac{m}{s^2}$)
+- $Q$ is discharge ($\frac{m^3}{s}$)
+- $S$ is the channel slope.
 
 &nbsp;
-&nbsp;
 
-### Contract
+### Function Components
 *Input*: Discharge ($Q$) in $\frac{m^3}{s}$ and channel slope ($S$).
 
 *Output*: Stream power ($\Omega$) in W.
 
-*Parameters*: Density of water ($\rho$) in $\frac{g}{m^3}$ and acceleration due to gravity ($g$) in $\frac{m}{s^2}$.
+*Parameters with Defaults*: Density of water ($\rho$) in $\frac{g}{m^3}$ (default = 1000 $\frac{g}{m^3}$) and acceleration due to gravity ($g$) in $\frac{m}{s^2}$ (default = 9.8 $\frac{m}{s^2}$).
 
 ### Function
 
@@ -69,44 +76,73 @@ stream_power(1, 1, g = 1, rho = 1)
 
 ```
 
-<<<<<<< HEAD
-=======
+
 ### Generate Data
 
+#### Method 1
 ```{r data1}
 
 ###### One way to generate data for the function ######
 
 # generate discharge values from a distribution
-nsample = 100
-discharges = rnorm(mean=25, sd=4, n=nsample)
-channelslopes = rnorm(mean=50, sd=1, n=nsample)
+nsample = 1000
+discharges = rnorm(mean = 25,
+                   sd = 4,
+                   n = nsample)
 
-#create a dataframe that has rows for each model run
+channelslopes = rnorm(mean = 50,
+                      sd = 1,
+                      n = nsample)
+
+# create a dataframe that has rows for each model run
 # columns for discharge, channel slope and stream power estimate
-results = data.frame(discharge=discharges, channelslope=channelslopes, streampower=NA)
+results = data.frame(discharge = discharges,
+                     channelslope = channelslopes,
+                     streampower = NA) %>%
+  mutate(streampower = stream_power(discharge, channelslope))
 
 head(results)
 
+# show results                         
+ggplot(results, aes(x = discharge, y = streampower, color = channelslope), alpha = 0.5) +
+  geom_point() +
+  labs(title = "Stream Power",
+       y = "Power (W)",
+       x = "Discharge (m^3/s)",
+       caption = "Ingulsrud & Morrow\nESM 262 - Winter 2020") +
+  theme_minimal()
+
 ```
 
+#### Method 2
 ```{r data2}
 
 ###### Second way to generate data for the function ######
 
 # generate a structure to store info on our possible streams
-possible_streams = data.frame(name = c("A","B","C"), discharge = c(10,20,30), channelslope = c(2,3,1))
+possible_streams = data.frame(name = c("A","B","C"),
+                              discharge = seq(from = 1, to = 60.9, by = 0.1),
+                              channelslope = seq(from = 30.05, to = 60, by = 0.05))
 
 # add to the data structure
-possible_streams$power = stream_power(Q = possible_streams$discharge, S = possible_streams$channelslope)
+possible_streams$power = stream_power(Q = possible_streams$discharge,
+                                      S = possible_streams$channelslope)
 
 head(possible_streams)
 
 # show results                         
-ggplot(possible_streams, aes(x=discharge, y=power, fill=channelslope))+geom_col()+labs(y="Power W", x="Discharge (m^3/s)")
+ggplot(possible_streams, aes(x = discharge, y = power, color = channelslope)) +
+  geom_point() +
+  labs(title = "Stream Power",
+       y = "Power (W)",
+       x = "Discharge (m^3/s)",
+       caption = "Ingulsrud & Morrow\nESM 262 - Winter 2020") +
+  theme_minimal()
 
 ```
 
-[Graph and add some text describing how to interpret the results. Why should we care?]
->>>>>>> efd5ad2b14641ac9183e37ec5779318ec8840a19
+### Interpretation of Results
+
+Power increases with discharge and channel slope.  This is consistent with our conception of energy dissipation being increased in streams of higher volumes and at steeper slopes.  A small mountain stream may have a similar power to a higher volume lowland stream due to the tradeoff between volume and slope.
+
 
