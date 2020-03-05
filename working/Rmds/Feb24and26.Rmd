@@ -286,15 +286,23 @@ Loops - similar to apply but more general
 ```{r loop }
 
 # repeat statement
+  # i is the counter; for loop needs a variable to use as the counter to count how many times it's going through the loop
+  # R will repeat everything that's between the {} 5 times; each times it will change the value of i
 a=0
 for (i in 1:5) {
  a = a+i
 }
 a
+# the 1st time, a=1
+# the 2nd time, a=1+2=3
+# the 3rd time, a=3+3=6
 
 # find the maximum speed
 speeds = runif(min=0, max=100, n=300)
 
+# can use an index into that array to find each speed in order
+  # set counter to start at 1, and go to length of speeds (could have said 1:300)
+  # between {}, says maxspeed is going to be if the current speed (indexed) is greater than the current speed, then replace it; otherwise just keep it at that speed
 maxspeed=0
 for ( i  in 1:length(speeds)) {
   maxspeed = ifelse(speeds[i] > maxspeed, speeds[i], maxspeed)
@@ -305,18 +313,38 @@ max(speeds)
 
 head(results)
 
+
 # apply's are R's internal loops - FAST
 # by column
 results_means = apply(results, 2, mean)
 # by row
 silly = apply(results,1,mean)
 
+
 # make a for loop to compute results_means
+sum_speeds = 0.0
+for (j in 1:length(speeds)) {
+  sum_speeds = sum_speeds + speeds[j]
+}
+
+sum_speeds
+  # 14381.79
+
+sum_speeds/length(speeds)
+  # 47.93928
+
+mean(speeds)
+  # 47.93928
+
 ```
 
 # Loops can be "nested" on loop in side the other
 
-Exampe: Calculate NPV or a range of different interest rates and a range of damages that may be incurred 10 years in the future
+Example: Calculate NPV for 
+
+* a range of different interest rates 
+* a range of damages 
+* that may be incurred 10 years in the future
 
 Steps
 
@@ -328,25 +356,34 @@ Steps
 
 Try it first...
 
-
 ```{r npvfor, echo=FALSE}
 
 # write a function to compute npv
-source("../../src/dataf/R/compute_NPV.R")
+# source("../../src/dataf/R/compute_NPV.R")
+# compute_NPV(20, discount=0.01, time=20)
+
+# write function for npv
+compute_NPV = function (value, time, discount) {
+  result = value/(1 + discount)^time
+  return(result)
+}
+
 compute_NPV(20, discount=0.01, time=20)
 
-
-#generate some input
+# generate some input
 damages = c(25,33,91,24)
 # sensitivity to discount rate
 discount_rates = seq(from=0.01, to=0.04, by=0.005)
 yr=10
 
-# compute some npv's for different discount rates
+# compute some npvs for different discount rates
 # first generate a dataframe to store results
 npvs = as.data.frame(matrix(nrow=length(damages), ncol=length(discount_rates)))
 
 # now use a for loop to populate
+  # each for loop has {} associated with it
+  # then can index into array (need 2 indices; one to say what row i'm at, one to say what column i'm at)
+  # 2-dimensional arrays: 1st is row (i), 2nd is column (j)
  for (i in 1:length(damages)) {
          for (j in 1:length(discount_rates)) {
        npvs[i,j]= compute_NPV(value=damages[i],       discount=discount_rates[j],time=yr )
@@ -354,29 +391,42 @@ npvs = as.data.frame(matrix(nrow=length(damages), ncol=length(discount_rates)))
          }
  }
  npvs
+  # for each damage, it calculates the NPV for each discount rate
  
+# some data wrangling
+colnames(npvs) = discount_rates
+rownames(npvs) = damages
+npvs
  
- #some data wrangling
-colnames(npvs)=discount_rates
-rownames(npvs)=damages
- npvs
+# gather by discount rate
+npvs = gather(npvs, 1:7, key=dis, value=npv)
+head(npvs)
  
-
- npvs = gather(npvs, 1:7, key=dis, value=npv)
- head(npvs)
- ggplot(npvs, aes(x=npv, col=as.factor(dis)))+geom_density(size=2)+scale_color_brewer(type="seq", name="Discount")
+# plot it
+ggplot(npvs, aes(x=npv, col=as.factor(dis))) +
+  geom_density(size=2) +
+  scale_color_brewer(type="seq", name="Discount")
  
- # how about summing all the damages
- npv.total =npvs %>% group_by(dis) %>% summarize(t=sum(npv))
- ggplot(npv.total, aes(dis,t, fill=dis))+geom_col() + labs(x="Discount Rate", y="Total ($)")
-
+# how about summing all the damages
+npv.total = npvs %>% 
+  group_by(dis) %>% 
+  summarize(t=sum(npv))
+ 
+# plot npv.total
+ggplot(npv.total, aes(dis,t, fill=dis)) + 
+  geom_col() + 
+  labs(x="Discount Rate", y="Total ($)")
  
 ```
 
+* by nesting for loops, you can apply functions over time, space
+* how does the answer vary over different times/places/dimensions?
+* what for loops are designed to help you do
+
+
 # Some other types of loops
 
-* while
-  useful for repeating until a condition is met
+* "while" loop is useful for repeating until a condition is met
 
 Example
 if a metal toxin in a lake increases by 1% per year, how many years will it take for the metal level to be greater than 30 units, if toxin is current at 5 units
@@ -385,6 +435,7 @@ if a metal toxin in a lake increases by 1% per year, how many years will it take
 ```{r} 
 
 # accumulate pollutant until a threshold - how many years does it take
+  # how long does it take for the lake to reach some level of toxicity?
 
 # initial conditions
 yr=1
@@ -398,10 +449,24 @@ pollutant_level = pollutant_level + 0.01* pollutant_level
 yr = yr + 1
 }
 
-pollutant_level
-yr
+pollutant_level # 30.2788
+yr # 182; it took 182 years before the pollutant level hit 30 units
 
 # while loop dangers
+  # they may never stop; you may never reach your threshold
+  # good idea while writing while loops to also write some kind of condition
+# initial conditions
+yr=1
+pollutant_level = 5
+
+# while loop with condition added
+while ((pollutant_level < 30) && (yr < 1000)) {
+  #pollutant_level = pollutant_level + 0.01* pollutant_level
+  yr = yr + 1
+}
+
+pollutant_level # 5
+yr # 1000
 
 ```
 
@@ -410,7 +475,7 @@ yr
 All programing languages use data-types, or structures to hold information
 
 * integer
-* floating point/ real / numeric
+* floating point / real / numeric
 * character 
 * string
 
@@ -418,6 +483,7 @@ Often data types are multi-dimensional
 Some useful ones in R
 
 * vector
+  - think of as a 1-dimensional array
 * matrix
 * data frame
 * tibble
@@ -443,30 +509,35 @@ Here's an example:
 First lets look at a standard numeric vector
 
 ```{r} 
+
+# define a vector by using c()
 a = c(1.3, 1, 4, 1.3, 22)
 # compute the mean
-mean(a)
+mean(a) # 5.92
+
 ```
 
 What if **a** is a factor
 
 What do commands like **mean** do
+
 ```{r} 
+
+# can change data type using "as."
 a = as.factor(a)
+
 # compute the mean
 mean(a)
+# no longer works, because it's not numeric anymore; it's a factor
 
-#why? lets look
+# why? lets look
 a
-
-
-
+# calls the numbers "levels"
+# turning the items into a vector into "categorical data"
 
 ```
 
 We can use **summary** with factors to get frequencies in each category (or “level” )
-
-
 
 ```{r fishes}
 
@@ -475,25 +546,31 @@ possible.fish = c("salmon","steelhead","shark","tuna","cod")
 
 # we can use sample to simulate a random recording of catch by fisherman, lets say we pick 20 fish from the net
 
+# create a sample catch (have to use replace=T because there aren't 20 different fish in the vector)
 catch1 = sample(possible.fish, size=20, replace=T)
 # because possible.fish was a factor catch1 will be a factor
 catch1
 
 summary(catch1)
+
 # if we want summary to be more useful - make this a factor
 catch1 = as.factor(catch1)
 
-
 # to quickly get frequencies of different fish and to plot 
 summary(catch1)
+  # tells you how many of each fish there are
+  # helpful when you want to count things in each category
+
+# plot this
 plot(catch1, col="blue")
+  # plot function automatically uses summary
 
 
 # we can also use summary to explore and return information about the distribution
 # mean frequency of a particular type of fish
 mean(summary(catch1))
 
-# maximum frequency
+# maximum frequency (the # of fish that are most frequent in the dataset)
 max(summary(catch1))
 
 # which fish was most frequently caught
@@ -504,6 +581,9 @@ names(which.max(summary(catch1)))
 
 # use results for creating text
 # sprintf creates a string %s mean use what ever is after the , to fill in a string
+  # a string is character data lumped together in some way
+  # sprintf: print something to a string
+    # type the words you want; can use special characters for substituting something in
 plottitle=sprintf("We like %s", names(which.max(summary(catch1))))
 
 plot(catch1, col="blue", main=plottitle)
@@ -519,17 +599,40 @@ plot(catch1, col="blue", main=plottitle)
 
 # Aside **sprintf**
 
-some useful syntax if you want to generate strings
+some useful syntax if you want to generate strings:
 
 * **%s** replace with a string
 * **%d** replace with an integer value
-* **%f** replace with a real value
-* **%4.1f** replace with a real value with 4 digist, two after decimal
+* **%f** replace with a real value (something with a decimal in it)
+* **%4.1f** replace with a real value with 4 digits, two after decimal
 * **\n** add a line return
 
 Try it
 
 make a string with **sprintf** and add to plot title
+
+```{r}
+
+# Make dailytemp an integer
+dailytemp = 10
+mint = 10
+maxt = 20.5
+
+# Create a string with sprintf and use %d to replace with an integer value
+newstring = sprintf("the min temperature today is %d and max %f", mint, maxt)
+newstring
+
+
+
+# Make a real value
+wave = 5.2
+
+wavestring = sprintf("the wave height is %f", wave)
+wavestring
+
+
+```
+
 
 
 # <span style="color:blue"> Functions with factors 
@@ -547,25 +650,26 @@ See
 
 ```{r diversity, echo=TRUE}
 
-source("../../src/dataf/R/compute_simpson_index.R")
+# Source compute_simpson_index.R function
+source("../../R/compute_simpson_index.R")
 compute_simpson_index
 
-
-possible.fish = as.factor(c("salmon","steelhead","shark","tuna","cod"))
 # simulate a random recording of catch by fisherman
-
+possible.fish = as.factor(c("salmon","steelhead","shark","tuna","cod"))
 
 # note here is answer to above challenge
 catch1 = sample(possible.fish, size=10, prob = c(0.2, 0.2, 0.1, 0.1, 0.4), replace=T)
+
 # lets create a test case that should have low diversity, by repeating the same thing
 catch2 = c(rep("salmon", times=10), rep("cod", times=10))
 
-compute_simpson_index(catch1)
-compute_simpson_index(catch2)
+compute_simpson_index(catch1) # 0.34
+compute_simpson_index(catch2) # 0.5
 
 ```
 
 What would be a useful error check here!
+  - be careful about dividing by zero
 
 Repeat for the alternative Simpson Diversity Index
 Test on the **fish.txt** 
@@ -579,19 +683,21 @@ How to change back? **as.numeric** makes sense ...but
 
 ```{r, echo=TRUE}
 
+# create vector of numbers, accidentally turn it into a factor
 a = as.factor(c(1.3, 1, 4, 1.3, 22))
-#sum(a)
+#sum(a) # won't work; sum isn't meaningful for factors
 
 # try to make a numeric version from the factor
 b = as.numeric(a)
-sum(b)
+sum(b) # 12
 b
 
 # better
 b = as.character(a)
 b = as.numeric(b)
 b
-sum(b)
+sum(b) # 29.6
+
 ```
 
 #  <span style="color:blue"> Returning multiple things from a function \span
@@ -610,9 +716,9 @@ In R, to do this we use LISTS
 sale = list(id=2, quality="high", contents=c("apple","cherry"), cost=c(4,5))
 sale
 
-#ways to access elements
+# ways to access elements
 sale$id
-sale$what
+sale$what # doesn't exist; returns "NULL"
 
 # you can also access by list item number
 # the [x] denotes the xth item in the list
@@ -621,13 +727,13 @@ sale[["contents"]]
 
 
 # how do you get the second element in the vector that has the contents
-# there are two ways
+# there are two ways:
 
-
-# add to a list
+# 1) add to a list
 sale$location = "Farmers market"
 sale
-# or remove
+
+# 2) or remove
 sale$location = NULL
 sale
 
@@ -635,6 +741,11 @@ sale
 # correct accessing items in list
 sale$cost
 sale[[4]]
+
+# to get just one of them, have to index into sale[[4]]
+sale[[4]][1] # 1st item in list
+sale[[4]][2] # 2nd item in list
+
 
 # works but
 #sale[4]
@@ -655,7 +766,7 @@ consider *lm*
 ```{r lmlist, echo=TRUE}
 
 # read in some streamflow data
-sage = read.table("../../src/dataf/data/sagedata.txt", header=T)
+sage = read.table("../datafiles/sagedata.txt", header=T)
 names(sage)
 
 # sum to water year
@@ -667,11 +778,11 @@ summary(res)
 
 #lm returns a list so we can look at the different elements
 
-res$coefficients
-res[["coefficients"]]
-res[["call"]]
+res$coefficients # Get the coefficients on the regression
+res[["coefficients"]] # Can also access it this way
+res[["call"]] # Spits back how you ran the linear model
 
-
+attributes(res) # Look at the names of anyting in the list that was returned by the lm
 
 ```
 
@@ -689,16 +800,71 @@ Lets start with diversity - many be want to know a bit more about the dataset
 ```{r diversitylist, echo=TRUE}
 
 # repeat with a list
-source("../../src/dataf/R/computediversity.R")
+source("../../R/computediversity.R")
 
 computediversity
 
 computediversity(catch1)
 computediversity(catch2)
+
 ```
 
 In class: Try adding to your diversity function: return the rarest species; 
 
+```{r}
+
+# read in flowers.txt
+flowers = read.table("../datafiles/flowers.txt")
+head(flowers)
+
+
+# create a function that just returns most common species and rarest species
+
+#' Describe diversity based on a list of species 
+#' 
+#' Compute a species diversity index
+#' @param species list of species (names, or code) 
+#' @return list with the following items
+#' \describe{
+#' \item{num}{ Number of distinct species}
+#' \item{simpson}{Value of simpson diversity index}
+#' \item{dominant}{Name of the most frequently occuring species}
+#' }
+#' @examples
+#' computediversity(c("butterfly","butterfly","mosquito","butterfly","ladybug","ladybug")))
+#' @references
+#' http://www.tiem.utk.edu/~gross/bioed/bealsmodules/simpsonDI.html
+
+computediversity_test = function(species) {
+
+species = as.factor(species)
+
+# use simple simpson form
+tmp = (summary(species)/sum(summary(species))) ** 2
+diversity = 1.0-sum(tmp)
+
+# number of species
+nspecies = length(summary(species))
+
+# which is the most frequent
+tmp = which.max(summary(species))
+dominant = names(summary(species)[tmp])
+
+# which is the most rare
+tmp = which.min(summary(species))
+rare = names(summary(species)[tmp])
+
+# output from function
+return(list(num=nspecies, simpson=diversity, dominant=dominant, rare=rare))
+}
+
+computediversity_test(flowers$V1)
+  # number of species = 4
+  # value of simpson diversity index = 0.74075
+  # dominant = daisy
+  # rare = rose
+
+```
 
  
  We can also use parameters to determine flow control in a function
@@ -706,12 +872,13 @@ In class: Try adding to your diversity function: return the rarest species;
  
 ```{r str, echo=FALSE}
 
-source("../../src/dataf/R/compute_season_meanflow.R")
+source("../../R/compute_season_meanflow.R")
 
-str = read.table("../src/dataf/data/str.txt", header=T)
+str = read.table("../datafiles/str.txt", header=T)
 compute_season_flow(str)
 
 compute_season_flow(str, kind="max")
+
 ```
 
 What you've learned
