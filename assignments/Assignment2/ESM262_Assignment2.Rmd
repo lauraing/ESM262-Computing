@@ -27,3 +27,43 @@ Assignment 2 - Simulating Fisheries
 - Generate some example data for your function; and show how this is created and used in an R markdown document 
 - Submit as usual as a git link on gauchospace
 - Contact Will or Naomi if you get stuck
+
+
+Input to Function:
+
+1. Table with prices for different fish
+```{r}
+
+# Create different fish (Pokemon)
+fish = c("Magikarp", "Goldeen", "Seaking", "Horsea", "Seadra")
+
+# Create prices for fish
+prices = c(10, 12, 16, 20, 25)
+
+# Create table with prices and fish
+fish_prices <- data.frame(row.names = fish, prices)
+
+```
+
+
+2. Table with number caught for each fish species for each location
+```{r}
+
+# Create locations where each fish species is caught
+locations = c("Vermilion City", "Cerulean City", "Pallet Town", "Pewter City", "Cinnabar Island")
+
+# Create catch number for each location
+Vermilion = c(500, 350, 290, 50, 160)
+Cerulean = c(200, 430, 300, 120, 230)
+Pallet = c(320, 120, 320, 35, 130)
+Pewter = c(480, 190, 140, 15, 220)
+Cinnabar = c(150, 400, 220, 70, 90)
+
+# Create table with catch at each location
+fish_catch <- matrix(c(Vermilion, Cerulean, Pallet, Pewter, Cinnabar), 
+                     nrow = 5, ncol = 5,
+                     dimnames = list(c(fish), c(locations)))
+
+
+```
+
