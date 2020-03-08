@@ -7,6 +7,8 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
 ```
 
 Assignment 2 - Simulating Fisheries
@@ -32,7 +34,7 @@ Assignment 2 - Simulating Fisheries
 Input to Function:
 
 1. Table with prices for different fish
-```{r}
+```{r fishprice}
 
 # Create different fish (Pokemon)
 fish = c("Magikarp", "Goldeen", "Seaking", "Horsea", "Seadra")
@@ -47,7 +49,7 @@ fish_prices <- data.frame(row.names = fish, prices)
 
 
 2. Table with number caught for each fish species for each location
-```{r}
+```{r catchlocation}
 
 # Create locations where each fish species is caught
 locations = c("Vermilion City", "Cerulean City", "Pallet Town", "Pewter City", "Cinnabar Island")
@@ -59,11 +61,57 @@ Pallet = c(320, 120, 320, 35, 130)
 Pewter = c(480, 190, 140, 15, 220)
 Cinnabar = c(150, 400, 220, 70, 90)
 
+catch_location = c(Vermilion, Cerulean, Pallet, Pewter, Cinnabar)
+
 # Create table with catch at each location
-fish_catch <- matrix(c(Vermilion, Cerulean, Pallet, Pewter, Cinnabar), 
+fish_catch <- matrix(c(catch_location), 
                      nrow = 5, ncol = 5,
                      dimnames = list(c(fish), c(locations)))
 
+```
+
+Function:
+```{r function}
+
+# Write a function that takes as input:
+  # a table that has prices for different fish
+  # a table that has the number caught for each fish species for each location
+
+# Create function that simulates fisheries revenue calculations
+fisheries_simulation = function(catch_location, prices, plot = F) {
+  # calculate the most frequently caught fish in each location
+  dominantfish = list(colnames(catch_location), rownames(catch_location)[apply(catch_location, 2, which.max)])
+  dominantfish_df = as.data.frame(dominantfish)
+  names(dominantfish_df) = c("Location", "Most Frequent Fish Caught")
+  # calculate the total revenue for each location
+  revenue_location = sum(prices[,1]*catch_location)
+  # calculate the total fisheries revenue sum
+  revenue_fish = prices[,1]*catch_location
+  revenue_fish = colSums(revenue_fish)
+  revenue_fish_df = as.data.frame(revenue_fish)
+  locations = c("Vermilion City", "Cerulean City", "Pallet Town", "Pewter City", "Cinnabar Island")
+  revenue_fish_df$location = locations
+  
+  # if user requests it graph of revenue by location and total revenue (as text)
+  if(plot) {
+    p <- ggplot(revenue_fish_df, aes(location, revenue_fish, fill = location)) +
+      geom_col() +
+      labs(x = "Location", y = "Revenue ($)", title = "Pokemon Fishing Revenue By Location", subtitle = sprintf("Total Revenue = $%d", revenue_location)) +
+      theme_bw() +
+      scale_fill_manual(values =c("salmon","goldenrod2","palegreen2", "aquamarine2","cornflowerblue"))
+  }
+  else p = NULL
+  
+  return(list(dominantfishery = dominantfish_df, totalrevenue = revenue_location, revenuefishery = revenue_fish_df, plot = p))
+
+}
 
 ```
 
+Run function:
+```{r run}
+
+# Run function
+fisheries_simulation(fish_catch, fish_prices, plot = T)
+
+```
