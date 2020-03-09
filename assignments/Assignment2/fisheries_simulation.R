@@ -1,6 +1,24 @@
-# Write a function that takes as input:
-# a table that has prices for different fish
-# a table that has the number caught for each fish species for each location
+#' Fisheries Simulation
+#' 
+#' This function takes the inputs
+#' - a table that has prices for different fish
+#' - a table that has the number caught for each fish species for each location
+#' and creates a data frame of containing
+#' - most frequently caught fish in each location
+#' - total revenue for each location
+#' - total fisheries revenue sum
+#' - plot of revenue by location and total revenue (optional, requires package ggplot2)
+#' 
+#' @param catch_location 
+#' @param prices 
+#' @param plot TRUE / FALSE to produce plot of revenue by location and total revenue
+#' 
+#' @author Laura Ingelsrud & Keene Morrow
+#' 
+#' @return dominantfishery
+#' @return totalrevenue
+#' @return revenuefishery
+#' @return plot
 
 # Create function that simulates fisheries revenue calculations
 fisheries_simulation = function(catch_location, prices, plot = F) {
@@ -19,11 +37,12 @@ fisheries_simulation = function(catch_location, prices, plot = F) {
   
   # if user requests it graph of revenue by location and total revenue (as text)
   if(plot) {
+    require(ggplot2)
     p <- ggplot(revenue_fish_df, aes(location, revenue_fish, fill = location)) +
       geom_col() +
-      labs(x = "Location", y = "Revenue ($)", title = "Pokemon Fishing Revenue By Location", subtitle = sprintf("Total Revenue = $%d", revenue_location)) +
+      labs(x = "Location", y = "Revenue (PD)", title = "Pokemon Fishing Revenue By Location", subtitle = sprintf("Total Revenue = $%d", revenue_location)) +
       theme_bw() +
-      scale_fill_manual(values =c("salmon","goldenrod2","palegreen2", "aquamarine2","cornflowerblue"))
+      scale_fill_manual(values =c("salmon", "goldenrod2", "palegreen2", "aquamarine2", "cornflowerblue"))
   }
   else p = NULL
   
