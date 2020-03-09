@@ -13,7 +13,7 @@
 #' @param prices 
 #' @param plot TRUE / FALSE to produce plot of revenue by location and total revenue
 #' 
-#' @author Laura Ingelsrud & Keene Morrow
+#' @author Laura Ingulsrud & Keene Morrow
 #' 
 #' @return dominantfishery data frame containing variables
 #' \describe{
