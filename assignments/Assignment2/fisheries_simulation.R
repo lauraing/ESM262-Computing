@@ -15,9 +15,17 @@
 #' 
 #' @author Laura Ingelsrud & Keene Morrow
 #' 
-#' @return dominantfishery
-#' @return totalrevenue
-#' @return revenuefishery
+#' @return dominantfishery data frame containing variables
+#' \describe{
+#'  \item{Location of catch}
+#'  \item{Most Frequent Fish Caught}
+#' }
+#' @return totalrevenue sum of prices at catch location
+#' @return revenuefishery data frame contianing variables
+#' \describe{
+#'  \item{Location of catch}
+#'  \item{revenue_fish revenue of catch by fish}
+#' }
 #' @return plot
 
 # Create function that simulates fisheries revenue calculations
